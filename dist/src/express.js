@@ -5,7 +5,8 @@ const express = require("express");
 //import * as bodyParser from 'body-parser'
 //create express app
 const app = express();
-const port = 4001;
+//for mocking data
+var faker = require('faker');
 //app.use(bodyParser.json())
 //app.use(bodyParser.urlencoded({ extended: true }))
 //app.use(cors())
