@@ -1,7 +1,9 @@
 /**This file is for implementing the server
 to listen for incoming connections*/
 import config from './../config/config'
-import app from './express'
+import App from './App'
+import * as http from 'http';
+import * as debug from 'debug';
 
 //URL connection
 //initizize library
@@ -19,7 +21,8 @@ db.connect()
        console.log("ERROR:", error.message);
    });
 //listen for the connection
-app.listen(config.port, (err) => {
+const server = http.createServer(App);
+server.listen(config.port, (err) => {
   if (err) {
     console.log(err)
   }
