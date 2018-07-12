@@ -1,9 +1,9 @@
 "use strict";
-
 import * as express from "express";
 //import * as Route from "./routes/route";
 import config from './../config/config'
 import UserRouter from './routes/UserRouter';
+
 //import * as path from "path";
 //import * as bodyParser from "body-parser";
 /**
