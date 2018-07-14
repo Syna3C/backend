@@ -1,10 +1,17 @@
-//import * as schema-js from "schema-js";
-var schema = require('js-schema');
+export class Users {
+  private _username: string;
+  private _email: string;
+  private _password: string;
 
-var users = schema({
-   username:String,
-    email:String,
-    password:String
-});
+  public get username(): string {
+    return this._username;
+  }
 
-export default users
+  public get email(): string {
+    return this._email;
+  }
+
+  public get password(): string {
+    return this._password;
+  }
+}
