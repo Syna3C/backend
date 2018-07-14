@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "server": "nodemon ./dist/src/server.js",
-    "prestart": "npm run lint",
+    "prestart": "npm run lint && echo \"Lint passed\"",
     "start": "tsc && nodemon --exec node ./dist/src/server.js",
     "test": "mocha --reporter spec --compilers ts:ts-node/register 'test/**/*.test.ts",
     "debug": "tsc &&  debug node ./dist/src/server.js",

@@ -11,7 +11,7 @@ import { app } from './app';
 const server = http.createServer(app);
 server.listen(config.port, (err: Error) => {
   if (err) {
-    console.error(err)
+    // console.error(err)
   }
-  console.info('Server started on port %s.', config.port)
+  // console.info('Server started on port %s.', config.port)
 });
