@@ -47,7 +47,7 @@ export class UserRouter {
       .catch((error) => {
         // console.log("ERROR:", error.message);
       });
-    db.any(`SELECT json_build_object(
+    db.one(`SELECT json_build_object(
       'UserId', u."UserId",
       'Email', u."Email",
       'Username', u."Username",
@@ -56,10 +56,17 @@ export class UserRouter {
       'CompanyId', u."CompanyId",
       'AboutMe', u."AboutMe",
       'Role', u."Role",
-      'Permissions', p.*)
+      'Permissions', p.*) as user
       FROM public."Users" u
-      JOIN public."Permissions" p ON u."Role" = p."Role" WHERE u."UserId" = $1`, userId)
-      .then(data => res.json(data))
+      JOIN public."Permissions" p ON u."Role" = p."Role" WHERE u."UserId" = $1 LIMIT 1`, userId)
+      .then(data => data.user)
+      .then(user => res.json(user))
+      .catch(err => {
+        if (err instanceof pgPromise.errors.QueryResultError) {
+          // The requested user was not found, respond with a 404 Not Found
+          res.status(404).end();
+        }
+      })
       .catch((err) => next(err));
   }
 
@@ -76,7 +83,7 @@ export class UserRouter {
         // console.log("ERROR:", error.message);
       });
 
-    db.any(`SELECT json_build_object(
+    db.many(`SELECT json_build_object(
       'UserId', u."UserId",
       'Email', u."Email",
       'Username', u."Username",
@@ -85,9 +92,10 @@ export class UserRouter {
       'CompanyId', u."CompanyId",
       'AboutMe', u."AboutMe",
       'Role', u."Role",
-      'Permissions', p.*)
+      'Permissions', p.*) as user
       FROM public."Users" u
       JOIN public."Permissions" p ON u."Role" = p."Role"`)
+      .then((dataArr) => dataArr.map(it => it.user))
       .then((data) => res.json(data))
       .catch((err) => next(err));
   }
