@@ -13,5 +13,6 @@ server.listen(envConfig.port, (err: Error) => {
   if (err) {
     // console.error(err)
   }
-  // console.info('Server started on port %s.', config.port)
+  // tslint:disable-next-line:no-console
+  console.info('Server started on port %s.', envConfig.port);
 });

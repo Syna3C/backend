@@ -88,3 +88,18 @@ router.get('/', requireAuth, (req, res) => res.json({
 router.post(`/api/${version}/login`, requireSignIn, UserRouter.login)
 
 app.use('/', router);
+
+
+if (process.env.NODE_ENV === 'local') {
+  app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+
+    if ('OPTIONS' === req.method) {
+      res.sendStatus(200);
+    } else {
+      next();
+    }
+  });
+}
