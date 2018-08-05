@@ -6,9 +6,9 @@ import * as passport from 'passport';
 import * as passportJwt from 'passport-jwt'
 import * as LocalStrategy from 'passport-local'
 
-import { secretKey } from '../config/secret'; // contains key of secret for decoding token
 import { UserRouter } from './routes/UserRouter';
 import { AppConstants } from './utils/AppConstants';
+import { envConfig } from './utils/envConfig'; // Environment-specific configuration
 
 export const app = express();
 
@@ -26,42 +26,42 @@ const extractJwt = passportJwt.ExtractJwt;
 
 // create local strategy
 
-const localOptions = { usernameField: 'email'};
+const localOptions = { usernameField: 'email' };
 
 /**
  * Sign in using Email and Password.
  */
 
 const localLogin = new LocalStrategy.Strategy(localOptions, (email, password, done) => {
-    return UserRouter.verifyUser(email)
-        .then((validUser) => {
-              bcrypt.compare(password, validUser.Password,)
-                 .then((validPassword: boolean) => {
-                    if (validPassword) {
-                        return done(null, validUser)
-                    }           
-        return done(null, false)
-    })
-    .catch(err => done(err, false))
-        });
+  return UserRouter.verifyUser(email)
+    .then((validUser) => {
+      bcrypt.compare(password, validUser.Password, )
+        .then((validPassword: boolean) => {
+          if (validPassword) {
+            return done(null, validUser)
+          }
+          return done(null, false)
+        })
+        .catch(err => done(err, false))
+    });
 });
 
 // setup options for JWT strategy
 const jwtOptions = {
-    jwtFromRequest: extractJwt.fromHeader('authorization'),
-    secretOrKey: secretKey.secret,
+  jwtFromRequest: extractJwt.fromHeader('authorization'),
+  secretOrKey: envConfig.jwtSecretKey,
 }
 
 // create jwt Strategy
 const jwtLogin = new jwtStrategy(jwtOptions, (payload: any, done: any) => {
-    return UserRouter.findUserById(payload.sub)
-        .then((foundUser) => {
-            if (foundUser) {
-                return done(null, foundUser)
-            }
-            return done(null, false)
-        })
-        .catch(err => done(err, false))
+  return UserRouter.findUserById(payload.sub)
+    .then((foundUser) => {
+      if (foundUser) {
+        return done(null, foundUser)
+      }
+      return done(null, false)
+    })
+    .catch(err => done(err, false))
 })
 // tell passport to use this strategy
 passport.use(jwtLogin)
@@ -82,7 +82,7 @@ app.post(`/api/${version}/signUp`, UserRouter.signUp)
 // Default Route requires authorization
 const router = express.Router();
 router.get('/', requireAuth, (req, res) => res.json({
-    message: 'Hello World'
+  message: 'Hello World'
 }));
 // Login User that requires authentication
 router.post(`/api/${version}/login`, requireSignIn, UserRouter.login)

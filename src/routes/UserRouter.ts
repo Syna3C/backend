@@ -3,11 +3,8 @@ import { NextFunction, Request, Response } from 'express';
 import * as jwt from 'jwt-simple';
 import * as pgPromise from 'pg-promise';
 
-// import { config } from '../../config/config'; // contains key of secret for decoding token
-
-import { secretKey } from '../../config/secret';
 import { db } from '../database';
-
+import { envConfig } from '../utils/envConfig';
 
 /**
  * Test making call
@@ -35,7 +32,7 @@ export class UserRouter {
   public static tokenForUser(data: any) {
     const timestamp = new Date().getTime()
     // const secretToken = jwt.sign({ sub: user.id, iat: timestamp }, secretKey.secret);
-    const secretToken = jwt.encode({sub: data, iat: timestamp}, secretKey.secret)
+    const secretToken = jwt.encode({ sub: data, iat: timestamp }, envConfig.jwtSecretKey)
     return secretToken;
   }
   public static getUser(req: Request, res: Response, next: NextFunction) {
@@ -140,6 +137,6 @@ export class UserRouter {
    */
   public static verifyUser(email: any) {
     const query = 'SELECT * FROM public."Users" WHERE "Email"=$1';
-    return db.oneOrNone(query,[email]);
+    return db.oneOrNone(query, [email]);
   }
 }
