@@ -34,11 +34,11 @@ const localOptions = { usernameField: 'email' };
 
 const localLogin = new LocalStrategy.Strategy(localOptions, (email, password, done) => {
   return UserRouter.verifyUser(email)
-    .then((validUser) => {
-      bcrypt.compare(password, validUser.Password, )
+    .then((dbUser) => {
+      bcrypt.compare(password, dbUser.password)
         .then((validPassword: boolean) => {
           if (validPassword) {
-            return done(null, validUser)
+            return done(null, dbUser)
           }
           return done(null, false)
         })
@@ -48,7 +48,7 @@ const localLogin = new LocalStrategy.Strategy(localOptions, (email, password, do
 
 // setup options for JWT strategy
 const jwtOptions = {
-  jwtFromRequest: extractJwt.fromHeader('authorization'),
+  jwtFromRequest: extractJwt.fromAuthHeaderAsBearerToken(),
   secretOrKey: envConfig.jwtSecretKey,
 }
 
@@ -66,6 +66,15 @@ const jwtLogin = new jwtStrategy(jwtOptions, (payload: any, done: any) => {
 // tell passport to use this strategy
 passport.use(jwtLogin)
 passport.use(localLogin)
+
+if (process.env.NODE_ENV === 'local') {
+  app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+    next();
+  });
+}
 
 const requireAuth = passport.authenticate('jwt', { session: false })
 // passport middleware. Session is set to false since JWT doesn't require sessions on the server
@@ -88,18 +97,3 @@ router.get('/', requireAuth, (req, res) => res.json({
 router.post(`/api/${version}/login`, requireSignIn, UserRouter.login)
 
 app.use('/', router);
-
-
-if (process.env.NODE_ENV === 'local') {
-  app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
-
-    if ('OPTIONS' === req.method) {
-      res.sendStatus(200);
-    } else {
-      next();
-    }
-  });
-}
