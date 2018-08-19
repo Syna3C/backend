@@ -20,7 +20,6 @@ CREATE TABLE public."Roles"
   "closeSubEvents" boolean NOT NULL DEFAULT false,
   "deleteOrganizer" boolean NOT NULL DEFAULT false,
   "closeThreads" boolean NOT NULL DEFAULT false,
-  "deleteOrganizer" boolean NOT NULL DEFAULT false,
   "deleteModerators" boolean NOT NULL DEFAULT false,
   "lockThreads" boolean NOT NULL DEFAULT false,
   "editUsers" boolean NOT NULL DEFAULT false
